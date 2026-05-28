@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/at-spec/command.schema.json",
+  "title": "AT Command Specification",
+  "type": "object",
+  "required": ["id", "numeric_id", "display_id", "name", "category", "syntax", "response"],
+  "additionalProperties": false,
+  "not": {"required": ["availability"]},
+  "properties": {
+    "id": {"type": "string"},
+    "numeric_id": {"type": "integer", "minimum": 1, "maximum": 2147483647},
+    "display_id": {"type": "string"},
+    "name": {"$ref": "#/$defs/localizedText"},
+    "summary": {"$ref": "#/$defs/localizedText"},
+    "category": {"type": "string"},
+    "type": {"type": "string", "enum": ["execute", "set", "read", "test", "urc", "mixed"]},
+    "status": {"type": "string", "enum": ["draft", "active", "stable", "deprecated", "removed"]},
+    "since": {"type": "object", "additionalProperties": {"type": "string"}},
+    "deprecated_since": {"type": "object", "additionalProperties": {"type": "string"}},
+    "replacement": {"type": "string"},
+    "syntax": {"$ref": "#/$defs/variantObject"},
+    "parameters": {"$ref": "#/$defs/variantObject"},
+    "response": {"$ref": "#/$defs/responseVariantObject"},
+    "examples": {"$ref": "#/$defs/variantObject"},
+    "notes": {
+      "type": "object",
+      "properties": {
+        "customer": {"$ref": "#/$defs/localizedList"},
+        "internal": {"$ref": "#/$defs/localizedList"}
+      },
+      "additionalProperties": false
+    },
+    "changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["version", "description"],
+        "additionalProperties": false,
+        "properties": {
+          "version": {"type": "string"},
+          "date": {"type": "string"},
+          "description": {"$ref": "#/$defs/localizedText"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "localizedText": {
+      "type": "object",
+      "properties": {"zh": {"type": "string"}, "en": {"type": "string"}},
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "localizedList": {
+      "type": "object",
+      "properties": {
+        "zh": {"type": "array", "items": {"type": "string"}},
+        "en": {"type": "array", "items": {"type": "string"}}
+      },
+      "additionalProperties": false,
+      "minProperties": 1
+    },
+    "groupedVariants": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "by_model": {"type": "object", "additionalProperties": true},
+        "by_feature": {"type": "object", "additionalProperties": true}
+      },
+      "anyOf": [{"required": ["by_model"]}, {"required": ["by_feature"]}]
+    },
+    "responseEntry": {
+      "type": "object",
+      "required": ["pattern", "final"],
+      "additionalProperties": false,
+      "properties": {"pattern": {"type": "string"}, "final": {"type": "boolean"}}
+    },
+    "responseBlock": {
+      "type": "object",
+      "required": ["timeout_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "timeout_ms": {"type": "integer", "minimum": 0},
+        "success": {"type": "array", "items": {"$ref": "#/$defs/responseEntry"}},
+        "error": {"type": "array", "items": {"$ref": "#/$defs/responseEntry"}},
+        "urc": {"type": "array", "items": {"$ref": "#/$defs/responseEntry"}}
+      },
+      "anyOf": [{"required": ["success"]}, {"required": ["error"]}, {"required": ["urc"]}]
+    },
+    "responseVariantMap": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "by_model": {"type": "object", "additionalProperties": {"$ref": "#/$defs/responseBlock"}},
+        "by_feature": {"type": "object", "additionalProperties": {"$ref": "#/$defs/responseBlock"}}
+      },
+      "anyOf": [{"required": ["by_model"]}, {"required": ["by_feature"]}]
+    },
+    "responseVariantObject": {
+      "oneOf": [
+        {"$ref": "#/$defs/responseBlock"},
+        {
+          "type": "object",
+          "required": ["default"],
+          "additionalProperties": false,
+          "properties": {
+            "default": {"$ref": "#/$defs/responseBlock"},
+            "variants": {"$ref": "#/$defs/responseVariantMap"}
+          }
+        }
+      ]
+    },
+    "variantObject": {
+      "oneOf": [
+        {"type": "string"},
+        {"type": "array"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "default": {},
+            "variants": {"$ref": "#/$defs/groupedVariants"}
+          },
+          "anyOf": [{"required": ["default"]}, {"required": ["variants"]}]
+        }
+      ]
+    }
+  }
+}

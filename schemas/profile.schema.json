@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/at-spec/profile.schema.json",
+  "title": "AT Model Profile",
+  "type": "object",
+  "required": [
+    "model_id",
+    "model_name",
+    "document_title",
+    "version",
+    "language"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "model_id": {
+      "type": "string",
+      "description": "Stable model id used by command variants and output naming."
+    },
+    "model_name": {
+      "type": "string"
+    },
+    "base_profiles": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Ordered list of base profile ids. Profiles are merged from first to last, then the model overrides them."
+    },
+    "document_title": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    },
+    "language": {
+      "type": "string",
+      "enum": ["zh", "en"]
+    },
+    "communication": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "oneOf": [
+            { "type": "string" },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "zh": { "type": "string" },
+                "en": { "type": "string" }
+              }
+            }
+          ]
+        },
+        "rows": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "value"],
+            "additionalProperties": false,
+            "properties": {
+              "name": {
+                "oneOf": [
+                  { "type": "string" },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "zh": { "type": "string" },
+                      "en": { "type": "string" }
+                    }
+                  }
+                ]
+              },
+              "value": {
+                "oneOf": [
+                  { "type": "string" },
+                  { "type": "number" },
+                  {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "zh": { "type": "string" },
+                      "en": { "type": "string" }
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "notes": {
+          "oneOf": [
+            { "type": "array", "items": { "type": "string" } },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "zh": { "type": "array", "items": { "type": "string" } },
+                "en": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "include_categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Categories appended to the base profile categories."
+    },
+    "include_commands": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Optional explicit command list. Usually command_order is preferred."
+    },
+    "exclude_commands": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "command_order": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Supported command list and document order. It is appended to inherited profile command order."
+    },
+    "order_after": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Mapping from command_id to anchor command_id. The command is moved after the anchor after inheritance merge."
+    },
+    "features": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["boolean", "string", "number"]
+      }
+    },
+    "options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "show_internal_notes": { "type": "boolean" },
+        "show_customer_notes": { "type": "boolean" },
+        "show_unsupported_commands": { "type": "boolean" }
+      }
+    }
+  }
+}

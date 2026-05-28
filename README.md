@@ -6,20 +6,18 @@
 - `CPS-Spec`：写频 / CPS / 二进制结构体协议规格数据仓库
 - 后续可扩展：`Upgrade-Spec`、`RSC-Spec`、`Calibration-Spec` 等
 
-## 设计目标
-
-公共工具库只维护“怎么校验、怎么生成、怎么发布”，不维护具体产品协议数据。
-
-建议职责边界：
+## 当前结构
 
 ```text
 spec-toolkit/
-├─ spec_toolkit/        # Python 公共库
-├─ schemas/             # 通用 schema 或 schema 基类
-├─ templates/           # 通用模板基类
-├─ scripts/             # 通用命令入口
-└─ docs/                # 工具库说明
+├─ scripts/             # 通用命令入口和 Python 工具实现
+├─ scripts/atspec/      # AT-Spec 适配器与共享逻辑
+├─ schemas/             # JSON schema
+├─ templates/           # Markdown / HTML / CSS 模板
+└─ docs/                # 工具库说明（后续扩展）
 ```
+
+工具库只维护“怎么校验、怎么生成、怎么发布”，不维护具体产品协议数据。
 
 具体协议数据继续放在各自仓库：
 
@@ -38,33 +36,46 @@ CPS-Spec/
 └─ raw/
 ```
 
-## 推荐迁移步骤
+## 作为 submodule 使用
 
-### 第 1 阶段：兼容拆分
-
-- `AT-Spec` 仍保留原有 `scripts/`、`templates/`、`schemas/`，保证现有发布流程可用。
-- `spec-toolkit` 先建立公共库结构。
-- 新增功能优先放到 `spec-toolkit`，旧功能逐步迁移。
-
-### 第 2 阶段：抽公共能力
-
-优先迁移这些通用能力：
-
-- YAML 加载与合并
-- profile/model 组合逻辑
-- variant 选择逻辑
-- Markdown/HTML/PDF 生成框架
-- release 校验
-- 版本差异报告
-- 机器可读 catalog 输出
-
-### 第 3 阶段：协议插件化
-
-不同协议通过 plugin / adapter 接入：
+推荐在规格数据仓库中挂载到：
 
 ```text
-AT adapter  -> commands / profiles / models
-CPS adapter -> messages / structs / profiles / models
+tools/spec-toolkit
 ```
 
-这样 `AT-Spec` 和 `CPS-Spec` 可以共用同一套生成、校验、发布流程。
+例如：
+
+```powershell
+git submodule add ../spec-toolkit tools/spec-toolkit
+git submodule update --init --recursive
+```
+
+AT-Spec 为了兼容旧命令，保留 `scripts/*.py` 作为轻量入口。真实实现位于：
+
+```text
+tools/spec-toolkit/scripts/
+```
+
+因此旧命令仍然可用：
+
+```powershell
+python scripts/validate_all.py
+python scripts/build_doc.py --model dp5x --format html
+```
+
+也可以直接调用工具库脚本：
+
+```powershell
+python tools/spec-toolkit/scripts/validate_all.py
+python tools/spec-toolkit/scripts/build_doc.py --model dp5x --format html
+```
+
+## 路径约定
+
+- `SPEC_ROOT` 环境变量可显式指定规格数据仓库根目录。
+- 未设置 `SPEC_ROOT` 时，工具默认使用当前工作目录作为规格数据仓库根目录。
+- `schemas/` 和 `templates/` 从 `spec-toolkit` 读取。
+- `commands/`、`profiles/`、`models/`、`output/`、`releases/` 从调用方规格仓库读取或写入。
+
+日常建议在规格数据仓库根目录执行命令。

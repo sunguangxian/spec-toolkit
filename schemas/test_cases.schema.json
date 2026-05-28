@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/at-spec/test_cases.schema.json",
+  "title": "AT Example Test Cases",
+  "type": "object",
+  "required": ["schema_version", "model", "case_count", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0"]
+    },
+    "model": {
+      "type": "object",
+      "required": ["model_id", "model_name", "document_title", "version", "language", "base_profiles", "features"],
+      "additionalProperties": true,
+      "properties": {
+        "model_id": { "type": "string" },
+        "model_name": { "type": "string" },
+        "document_title": { "type": "string" },
+        "version": { "type": "string" },
+        "language": { "type": "string" },
+        "base_profiles": { "type": "array", "items": { "type": "string" } },
+        "features": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "case_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "cases": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/testCase" }
+    }
+  },
+  "$defs": {
+    "testCase": {
+      "type": "object",
+      "required": ["case_id", "command_id", "display_id", "category", "title", "command", "expected_response", "source", "example_index"],
+      "additionalProperties": false,
+      "properties": {
+        "case_id": { "type": "string" },
+        "command_id": { "type": "string" },
+        "display_id": { "type": "string" },
+        "category": { "type": "string" },
+        "title": { "type": "string" },
+        "command": { "type": "string" },
+        "expected_response": { "type": "array", "items": { "type": "string" } },
+        "source": { "type": "string" },
+        "example_index": { "type": "integer", "minimum": 1 }
+      }
+    }
+  }
+}

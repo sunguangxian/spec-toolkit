@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/at-spec/model_catalog.schema.json",
+  "title": "AT Model Catalog",
+  "type": "object",
+  "required": ["schema_version", "model", "command_count", "commands"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "enum": ["1.0", "1.1", "1.2"]
+    },
+    "model": {
+      "type": "object",
+      "required": ["model_id", "model_name", "document_title", "version", "language", "base_profiles", "features"],
+      "additionalProperties": false,
+      "properties": {
+        "model_id": { "type": "string" },
+        "model_name": { "type": "string" },
+        "document_title": { "type": "string" },
+        "version": { "type": "string" },
+        "language": { "type": "string", "enum": ["zh", "en"] },
+        "base_profiles": { "type": "array", "items": { "type": "string" } },
+        "features": { "type": "object", "additionalProperties": true }
+      }
+    },
+    "command_count": { "type": "integer", "minimum": 0 },
+    "commands": { "type": "array", "items": { "$ref": "#/$defs/command" } }
+  },
+  "$defs": {
+    "responseEntry": {
+      "type": "object",
+      "required": ["pattern", "final"],
+      "additionalProperties": false,
+      "properties": {
+        "pattern": { "type": "string" },
+        "final": { "type": "boolean" }
+      }
+    },
+    "responseBlock": {
+      "type": "object",
+      "required": ["timeout_ms"],
+      "additionalProperties": false,
+      "properties": {
+        "timeout_ms": { "type": "integer", "minimum": 0 },
+        "success": { "type": "array", "items": { "$ref": "#/$defs/responseEntry" } },
+        "error": { "type": "array", "items": { "$ref": "#/$defs/responseEntry" } },
+        "urc": { "type": "array", "items": { "$ref": "#/$defs/responseEntry" } }
+      },
+      "anyOf": [{ "required": ["success"] }, { "required": ["error"] }, { "required": ["urc"] }]
+    },
+    "variantMeta": {
+      "type": "object",
+      "required": ["source", "reason"],
+      "additionalProperties": false,
+      "properties": {
+        "source": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "command": {
+      "type": "object",
+      "required": [
+        "id",
+        "numeric_id",
+        "display_id",
+        "name",
+        "summary",
+        "category",
+        "type",
+        "status",
+        "since",
+        "deprecated_since",
+        "replacement",
+        "source",
+        "syntax",
+        "parameters",
+        "response",
+        "examples",
+        "variant"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": { "type": "string" },
+        "numeric_id": { "type": "integer", "minimum": 1, "maximum": 2147483647 },
+        "display_id": { "type": "string" },
+        "name": { "type": "string" },
+        "summary": { "type": "string" },
+        "category": { "type": "string" },
+        "type": { "type": "string" },
+        "status": { "type": "string" },
+        "since": { "type": "object", "additionalProperties": { "type": "string" } },
+        "deprecated_since": { "type": "object", "additionalProperties": { "type": "string" } },
+        "replacement": { "type": "string" },
+        "source": { "type": "string" },
+        "syntax": {},
+        "parameters": {},
+        "response": { "$ref": "#/$defs/responseBlock" },
+        "examples": {},
+        "variant": {
+          "type": "object",
+          "required": ["syntax", "parameters", "response", "examples"],
+          "additionalProperties": false,
+          "properties": {
+            "syntax": { "$ref": "#/$defs/variantMeta" },
+            "parameters": { "$ref": "#/$defs/variantMeta" },
+            "response": { "$ref": "#/$defs/variantMeta" },
+            "examples": { "$ref": "#/$defs/variantMeta" }
+          }
+        }
+      }
+    }
+  }
+}

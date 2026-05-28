@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="{{ language }}">
+<head>
+  <meta charset="utf-8">
+  <title>{{ model.document_title }}</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="cover">
+    <div class="cover-band"></div>
+    <div class="cover-content">
+      <p class="doc-kind">AT Command Specification</p>
+      <h1>{{ model.document_title }} <span class="pdf-bookmark-marker">__PDF_BM_COVER__</span></h1>
+      <p class="doc-subtitle">Peripheral Equipment Interface User Manual</p>
+      <table class="meta">
+        <tbody>
+          <tr><th>Model</th><td>{{ model.model_name }}</td></tr>
+          <tr><th>Version</th><td>{{ model.version }}</td></tr>
+          <tr><th>Release Date</th><td>{{ generated_date }}</td></tr>
+          <tr><th>Language</th><td>{{ language }}</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="cover-footer">Generated AT command user documentation</div>
+  </header>
+
+  <section class="front-matter" id="document-note">
+    <h1 class="bookmark-title">文档说明 <span class="pdf-bookmark-marker">__PDF_BM_FRONT_MATTER__</span></h1>
+    <p>本文档描述 {{ model.model_name }} 终端支持的 AT 指令、响应格式、参数含义和错误码信息。</p>
+  </section>
+
+  <section class="revision-history" id="revision-history">
+    <h1 class="bookmark-title">修改记录 <span class="pdf-bookmark-marker">__PDF_BM_REVISION_HISTORY__</span></h1>
+    <table class="revision-table">
+      <thead>
+        <tr><th>Version</th><th>Date</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+        {% for rev in revision_history %}
+        <tr>
+          <td>{{ rev.version }}</td>
+          <td>{{ rev.date }}</td>
+          <td>
+            {% if rev.changes is sequence and rev.changes is not string %}
+            <ul class="revision-changes">
+              {% for change in rev.changes %}<li>{{ change }}</li>{% endfor %}
+            </ul>
+            {% else %}
+            {{ rev.changes }}
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="toc" id="table-of-contents">
+    <h1 class="bookmark-title">目录 <span class="pdf-bookmark-marker">__PDF_BM_TOC__</span></h1>
+    <div class="toc-list">
+      <a class="toc-row toc-level-1" href="#revision-history"><span class="toc-no">-</span><span class="toc-text">修改记录</span></a>
+      <a class="toc-row toc-level-1" href="#communication"><span class="toc-no">1</span><span class="toc-text">通信端口配置</span></a>
+      <a class="toc-row toc-level-1" href="#command-list"><span class="toc-no">2</span><span class="toc-text">支持指令列表</span></a>
+      <a class="toc-row toc-level-1" href="#command-details"><span class="toc-no">3</span><span class="toc-text">指令详细说明</span></a>
+      {% for item in rendered_commands %}
+      {% if item.command.category != 'Error Code' %}
+      <a class="toc-row toc-level-2" href="#{{ item.anchor }}"><span class="toc-no">3.{{ loop.index }}</span><span class="toc-text"><code>{{ item.display_id }}</code> {{ item.name }}</span></a>
+      {% endif %}
+      {% endfor %}
+      <a class="toc-row toc-level-1" href="#appendices"><span class="toc-no">A</span><span class="toc-text">附录</span></a>
+      {% for item in rendered_commands %}
+      {% if item.command.category == 'Error Code' %}
+      <a class="toc-row toc-level-2" href="#appendix-error-code"><span class="toc-no">A.1</span><span class="toc-text">错误码说明</span></a>
+      {% endif %}
+      {% endfor %}
+      {% if image_appendices %}
+      <a class="toc-row toc-level-2" href="#image-appendices"><span class="toc-no">A.2</span><span class="toc-text">流程图</span></a>
+      {% for appendix in image_appendices %}
+      <a class="toc-row toc-level-2" href="#{{ appendix.anchor }}"><span class="toc-no">A.2.{{ loop.index }}</span><span class="toc-text">{{ appendix.title }}</span></a>
+      {% endfor %}
+      {% endif %}
+      {% if code_appendices %}
+      <a class="toc-row toc-level-2" href="#code-appendices"><span class="toc-no">{{ 'A.3' if image_appendices else 'A.2' }}</span><span class="toc-text">参考代码</span></a>
+      {% for appendix in code_appendices %}
+      <a class="toc-row toc-level-2" href="#{{ appendix.anchor }}"><span class="toc-no">{{ 'A.3' if image_appendices else 'A.2' }}.{{ loop.index }}</span><span class="toc-text">{{ appendix.title }}</span></a>
+      {% endfor %}
+      {% endif %}
+    </div>
+  </section>
+
+  <section id="communication">
+    <h1 class="bookmark-title">1. 通信端口配置 <span class="pdf-bookmark-marker">__PDF_BM_COMMUNICATION__</span></h1>
+    {% if communication.description %}<p>{{ communication.description }}</p>{% endif %}
+    <table class="communication-table">
+      <thead>
+        <tr><th>项目</th><th>配置</th></tr>
+      </thead>
+      <tbody>
+        {% for row in communication.rows %}
+        <tr><td>{{ row.name }}</td><td>{{ row.value }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if communication.notes %}
+    <ul class="notes">
+      {% for note in communication.notes %}<li>{{ note }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+
+  <section id="command-list">
+    <h1 class="bookmark-title">2. 支持指令列表 <span class="pdf-bookmark-marker">__PDF_BM_COMMAND_LIST__</span></h1>
+    <table class="matrix">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Command</th>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% set ns = namespace(no=0) %}
+        {% for cmd in commands %}
+        {% if cmd.category != 'Error Code' %}
+        {% set ns.no = ns.no + 1 %}
+        <tr>
+          <td>{{ ns.no }}</td>
+          <td><a href="#{{ cmd.anchor }}"><code>{{ cmd.display_id or cmd.id }}</code></a></td>
+          <td>{{ cmd.localized_name }}</td>
+          <td>{{ cmd.category }}</td>
+          <td><span class="status">{{ cmd.status or '' }}</span></td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section id="command-details">
+    <h1 class="bookmark-title">3. 指令详细说明 <span class="pdf-bookmark-marker">__PDF_BM_COMMAND_DETAILS__</span></h1>
+  </section>
+
+  {% set cmd_ns = namespace(no=0) %}
+  {% for item in rendered_commands %}
+  {% if item.command.category != 'Error Code' %}
+  {% set cmd_ns.no = cmd_ns.no + 1 %}
+  <section class="command" id="{{ item.anchor }}">
+    <h2>3.{{ cmd_ns.no }} <code>{{ item.display_id }}</code> {{ item.name }} <span class="pdf-bookmark-marker">__PDF_BM_CMD_{{ cmd_ns.no }}__</span></h2>
+    {% if item.summary %}<p class="summary">{{ item.summary }}</p>{% endif %}
+
+    <h3>Syntax</h3>
+    <table class="syntax-table">
+      <tbody>
+        {% for key, value in item.syntax.items() %}
+        {% if key != 'description' %}
+        <tr><th>{{ key }}</th><td><code>{{ value }}</code></td></tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if item.syntax_description %}<p class="note">{{ item.syntax_description }}</p>{% endif %}
+
+    {% if item.parameters %}
+    <h3>Parameters</h3>
+    <table class="parameter-table">
+      <thead>
+        <tr><th>Name</th><th>Type</th><th>Required</th><th>Range / Values</th><th>Description</th></tr>
+      </thead>
+      <tbody>
+      {% for p in item.parameters %}
+        <tr>
+          <td><code>{{ p.name }}</code></td>
+          <td>{{ p.type }}</td>
+          <td>{{ p.required_text }}</td>
+          <td>{{ p.range_values_text }}</td>
+          <td>{{ p.description_text }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    {% endif %}
+
+    {% if item.response %}
+    <h3>Response</h3>
+    <div class="response-grid">
+      {% if item.response.success %}
+      <div class="response-block">
+        <div class="block-title">Success</div>
+        <pre>{% for entry in item.response.success %}{{ entry.pattern }}
+{% endfor %}</pre>
+      </div>
+      {% endif %}
+      {% if item.response.error %}
+      <div class="response-block">
+        <div class="block-title">Error</div>
+        <pre>{% for entry in item.response.error %}{{ entry.pattern }}
+{% endfor %}</pre>
+      </div>
+      {% endif %}
+      {% if item.response.urc %}
+      <div class="response-block">
+        <div class="block-title">URC</div>
+        <pre>{% for entry in item.response.urc %}{{ entry.pattern }}
+{% endfor %}</pre>
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    {% if item.examples %}
+    <h3>Examples</h3>
+    <div class="examples">
+    {% for example in item.examples %}
+      <div class="example-card">
+        <div class="example-title">{{ example.title_text }}</div>
+        <pre><span class="prompt">Command</span>
+{{ example.command }}{% if example.response %}
+
+<span class="prompt">Response</span>
+{% for line in example.response %}{{ line }}
+{% endfor %}{% endif %}</pre>
+      </div>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    {% if item.notes %}
+    <h3>Notes</h3>
+    <ul class="notes">
+      {% for note in item.notes %}<li>{{ note }}</li>{% endfor %}
+    </ul>
+    {% endif %}
+  </section>
+  {% endif %}
+  {% endfor %}
+
+  <section id="appendices" class="code-appendices">
+    <h1 class="bookmark-title">附录 <span class="pdf-bookmark-marker">__PDF_BM_APPENDIX__</span></h1>
+    {% for item in rendered_commands %}
+    {% if item.command.category == 'Error Code' %}
+    <article class="code-appendix" id="appendix-error-code">
+      <h2>A.1 错误码说明 <span class="pdf-bookmark-marker">__PDF_BM_ERROR_CODES__</span></h2>
+      {% if item.summary %}<p class="note">{{ item.summary }}</p>{% endif %}
+      <table class="parameter-table error-code-table">
+        <thead>
+          <tr><th>ErrorCode</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+        {% for p in item.parameters %}
+          <tr>
+            <td><code>{{ p.name }}</code></td>
+            <td>{{ p.description_text }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </article>
+    {% endif %}
+    {% endfor %}
+
+    {% if image_appendices %}
+    <section id="image-appendices" class="image-appendices">
+      <h2>A.2 流程图 <span class="pdf-bookmark-marker">__PDF_BM_IMAGE_APPENDICES__</span></h2>
+      {% for appendix in image_appendices %}
+      <article class="image-appendix" id="{{ appendix.anchor }}">
+        <h3>A.2.{{ loop.index }} {{ appendix.title }} <span class="pdf-bookmark-marker">__PDF_BM_IMAGE_{{ loop.index }}__</span></h3>
+        {% if appendix.description %}<p class="note">{{ appendix.description }}</p>{% endif %}
+        {% set appendix_no = loop.index %}
+        {% for image in appendix.images %}
+        <figure class="doc-figure">
+          <img src="{{ image.src }}" alt="{{ image.alt }}">
+          {% if image.caption %}<figcaption>图 A.2.{{ appendix_no }}-{{ loop.index }} {{ image.caption }}</figcaption>{% endif %}
+        </figure>
+        {% endfor %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+
+    {% if code_appendices %}
+    <section id="code-appendices">
+      <h2>{{ 'A.3' if image_appendices else 'A.2' }} 参考代码 <span class="pdf-bookmark-marker">__PDF_BM_REFERENCE_CODE__</span></h2>
+      {% for appendix in code_appendices %}
+      <article class="code-appendix" id="{{ appendix.anchor }}">
+        <h3>{{ 'A.3' if image_appendices else 'A.2' }}.{{ loop.index }} {{ appendix.title }} <span class="pdf-bookmark-marker">__PDF_BM_CODE_{{ loop.index }}__</span></h3>
+        {% if appendix.description %}<p class="note">{{ appendix.description }}</p>{% endif %}
+        {% for file in appendix.files %}
+        <div class="code-file">
+          <div class="code-file-title"><code>{{ file.path }}</code></div>
+          <pre class="code-block"><code>{{ file.content }}</code></pre>
+        </div>
+        {% endfor %}
+      </article>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </section>
+</body>
+</html>

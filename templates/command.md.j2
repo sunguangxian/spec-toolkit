@@ -1,0 +1,98 @@
+## {{ index }}. {{ command.display_id }} - {{ command.name[language] }}
+
+### {{ index }}.1 功能说明
+
+{{ command.summary[language] }}
+
+{% if syntax_description %}
+> {{ syntax_description }}
+{% endif %}
+
+{% if command.category == 'Error Code' %}
+### {{ index }}.2 错误码说明
+
+| ErrorCode | Description |
+|---:|---|
+{% for p in parameters %}
+| {{ p.name }} | {{ p.description[language] if p.description is mapping else p.description }} |
+{% endfor %}
+
+{% else %}
+### {{ index }}.2 指令格式
+
+{% for k, v in syntax.items() %}
+{% if v %}
+```text
+{{ v }}
+```
+{% endif %}
+{% endfor %}
+
+### {{ index }}.3 参数说明
+
+| 参数 | 类型 | 必选 | 说明 |
+|---|---|---:|---|
+{% for p in parameters %}
+| {{ p.name }} | {{ p.type }} | {{ "是" if p.required else "否" }} | {{ p.description[language] if p.description is mapping else p.description }} |
+{% endfor %}
+
+### {{ index }}.4 响应
+
+{% if response.success is defined and response.success %}
+成功：
+
+```text
+{% for item in response.success %}
+{{ item.pattern }}
+{% endfor %}
+```
+{% endif %}
+
+{% if response.error is defined and response.error %}
+失败：
+
+```text
+{% for item in response.error %}
+{{ item.pattern }}
+{% endfor %}
+```
+{% endif %}
+
+{% if response.urc is defined and response.urc %}
+主动上报：
+
+```text
+{% for item in response.urc %}
+{{ item.pattern }}
+{% endfor %}
+```
+{% endif %}
+
+### {{ index }}.5 示例
+
+{% for ex in examples %}
+{{ ex.title[language] }}
+
+发送：
+
+```text
+{{ ex.command }}
+```
+
+响应：
+
+```text
+{% for line in ex.response %}
+{{ line }}
+{% endfor %}
+```
+{% endfor %}
+
+{% if notes %}
+### {{ index }}.6 注意事项
+
+{% for note in notes %}
+- {{ note }}
+{% endfor %}
+{% endif %}
+{% endif %}
