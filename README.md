@@ -51,20 +51,11 @@ git submodule add ../spec-toolkit tools/spec-toolkit
 git submodule update --init --recursive
 ```
 
-AT-Spec 为了兼容旧命令，保留 `scripts/*.py` 作为轻量入口。真实实现位于：
+规格数据仓库不再复制或保留工具脚本。命令统一从 submodule 直接调用：
 
 ```text
 tools/spec-toolkit/scripts/
 ```
-
-因此旧命令仍然可用：
-
-```powershell
-python scripts/validate_all.py
-python scripts/build_doc.py --model dp5x --format html
-```
-
-也可以直接调用工具库脚本：
 
 ```powershell
 python tools/spec-toolkit/scripts/validate_all.py

@@ -13,6 +13,7 @@ from atspec.core import (
     get_commands_for_model,
     load_command_specs,
     load_model_profile,
+    script_path,
     write_text,
 )
 
@@ -143,22 +144,22 @@ def release_model(model_id: str, include_pdf: bool, force: bool, customer: bool,
     if staging_dir.exists():
         shutil.rmtree(staging_dir)
 
-    run([sys.executable, "scripts/validate_all.py"])
-    release_check = [sys.executable, "scripts/validate_release.py", "--model", model_id]
+    run([sys.executable, script_path("validate_all.py")])
+    release_check = [sys.executable, script_path("validate_release.py"), "--model", model_id]
     if customer:
         release_check.append("--customer")
     run(release_check)
-    run([sys.executable, "scripts/build_doc.py", "--model", model_id, "--format", "md"])
-    run([sys.executable, "scripts/build_doc.py", "--model", model_id, "--format", "html"])
+    run([sys.executable, script_path("build_doc.py"), "--model", model_id, "--format", "md"])
+    run([sys.executable, script_path("build_doc.py"), "--model", model_id, "--format", "html"])
     if include_pdf:
-        run([sys.executable, "scripts/build_doc.py", "--model", model_id, "--format", "pdf"])
-    run([sys.executable, "scripts/export_changelog.py", "--model", model_id])
-    run([sys.executable, "scripts/export_matrix.py"])
-    run([sys.executable, "scripts/export_release_review.py", "--model", model_id])
-    run([sys.executable, "scripts/export_model_catalog.py", "--model", model_id])
-    run([sys.executable, "scripts/export_test_cases.py", "--model", model_id])
+        run([sys.executable, script_path("build_doc.py"), "--model", model_id, "--format", "pdf"])
+    run([sys.executable, script_path("export_changelog.py"), "--model", model_id])
+    run([sys.executable, script_path("export_matrix.py")])
+    run([sys.executable, script_path("export_release_review.py"), "--model", model_id])
+    run([sys.executable, script_path("export_model_catalog.py"), "--model", model_id])
+    run([sys.executable, script_path("export_test_cases.py"), "--model", model_id])
     for language in ["c", "csharp", "python"]:
-        run([sys.executable, "scripts/generate_command_bindings.py", "--model", model_id, "--language", language])
+        run([sys.executable, script_path("generate_command_bindings.py"), "--model", model_id, "--language", language])
 
     output = ROOT / "output"
     bindings_output = output / "bindings"
@@ -169,7 +170,7 @@ def release_model(model_id: str, include_pdf: bool, force: bool, customer: bool,
     if previous_version:
         run([
             sys.executable,
-            "scripts/diff_releases.py",
+            script_path("diff_releases.py"),
             "--model",
             model_id,
             "--left",
@@ -243,7 +244,7 @@ def release_model(model_id: str, include_pdf: bool, force: bool, customer: bool,
     write_text(staging_dir / "release_info.yaml", "\n".join(lines) + "\n")
     artifact_check = [
         sys.executable,
-        "scripts/validate_release_artifacts.py",
+        script_path("validate_release_artifacts.py"),
         "--model",
         model_id,
         "--release-dir",

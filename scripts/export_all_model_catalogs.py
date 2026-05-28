@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-from atspec.core import iter_model_files
+from atspec.core import iter_model_files, script_path
 
 
 def run(cmd):
@@ -13,7 +13,7 @@ def run(cmd):
 
 def main():
     for model_file in iter_model_files():
-        run([sys.executable, 'scripts/export_model_catalog.py', '--model', model_file.stem])
+        run([sys.executable, script_path('export_model_catalog.py'), '--model', model_file.stem])
 
 
 if __name__ == '__main__':

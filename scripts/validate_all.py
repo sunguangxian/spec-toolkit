@@ -1,15 +1,17 @@
 import subprocess
 import sys
 
+from atspec.core import script_path
+
 CHECKS = [
-    [sys.executable, "scripts/validate_commands.py"],
-    [sys.executable, "scripts/validate_examples.py"],
-    [sys.executable, "scripts/validate_variants.py"],
-    [sys.executable, "scripts/validate_binary_examples.py"],
-    [sys.executable, "scripts/validate_strict.py"],
-    [sys.executable, "scripts/validate_catalogs.py"],
-    [sys.executable, "scripts/validate_test_cases.py"],
-    [sys.executable, "scripts/validate_model_diff.py"],
+    [sys.executable, script_path("validate_commands.py")],
+    [sys.executable, script_path("validate_examples.py")],
+    [sys.executable, script_path("validate_variants.py")],
+    [sys.executable, script_path("validate_binary_examples.py")],
+    [sys.executable, script_path("validate_strict.py")],
+    [sys.executable, script_path("validate_catalogs.py")],
+    [sys.executable, script_path("validate_test_cases.py")],
+    [sys.executable, script_path("validate_model_diff.py")],
 ]
 
 

@@ -116,8 +116,8 @@ def main() -> None:
         print(f"Updated profile command_order: profiles/{args.profile}.yaml")
     print("Next steps:")
     print("  1. Replace TODO fields in the generated command.")
-    print("  2. Run: python scripts/validate_all.py")
-    print(f"  3. Run: python scripts/build_doc.py --model <model_id> --format html")
+    print("  2. Run: python tools/spec-toolkit/scripts/validate_all.py")
+    print("  3. Run: python tools/spec-toolkit/scripts/build_doc.py --model <model_id> --format html")
 
 
 if __name__ == "__main__":

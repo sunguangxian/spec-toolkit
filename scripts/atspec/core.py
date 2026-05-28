@@ -2,6 +2,7 @@ import copy, os, pathlib, yaml
 from typing import Any, Dict, Iterable, List, Set
 
 TOOLKIT_ROOT = pathlib.Path(__file__).resolve().parents[2]
+SCRIPT_ROOT = TOOLKIT_ROOT / "scripts"
 
 
 def find_spec_root() -> pathlib.Path:
@@ -26,6 +27,10 @@ SUPPORTED_VARIANT_GROUPS = {"by_model", "by_feature"}
 
 def toolkit_path(*parts: str) -> pathlib.Path:
     return TOOLKIT_ROOT.joinpath(*parts)
+
+
+def script_path(script_name: str) -> str:
+    return str(SCRIPT_ROOT / script_name)
 
 def load_yaml(path: pathlib.Path) -> Any:
     with open(path, "r", encoding="utf-8") as f:

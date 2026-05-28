@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-from atspec.core import ROOT, iter_model_ids
+from atspec.core import ROOT, iter_model_ids, script_path
 
 
 def run(args: list[str]) -> None:
@@ -18,7 +18,7 @@ def main() -> None:
         sys.exit(1)
 
     for model_id in model_ids:
-        run([sys.executable, "scripts/export_changelog.py", "--model", model_id])
+        run([sys.executable, script_path("export_changelog.py"), "--model", model_id])
 
 
 if __name__ == "__main__":
